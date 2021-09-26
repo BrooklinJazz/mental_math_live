@@ -3,10 +3,16 @@ defmodule MentalMath.Games.GameServer do
   alias MentalMath.RandomTrivia
   alias MentalMath.SingleDigitAddition
   # Callbacks
+  @score_table :score_table
 
   @impl true
   def init(_opts) do
-    {:ok, %{score: 0, current_trivia: new_trivia()}}
+    with :undefined <- :ets.whereis(@score_table) do
+      :ets.new(@score_table, [:set, :named_table, :public])
+      :ets.insert(@score_table, {"player 1", 0})
+    end
+
+    {:ok, %{current_trivia: new_trivia()}}
   end
 
   @impl true
@@ -27,21 +33,30 @@ defmodule MentalMath.Games.GameServer do
   @impl true
   def handle_call({:answer, answer}, _from, state) do
     with true <- answer == state.current_trivia.answer do
+      prev_score = score("player 1")
+      :ets.insert(@score_table, {"player 1", prev_score + 1})
+
       {:reply, true,
        %{
          state
-         | score: state.score + 1,
-           current_trivia: new_trivia()
+         | current_trivia: new_trivia()
        }}
     end
   end
 
-  def start_link(opts \\ %{}) do
+  def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts)
   end
 
-  def score(server) do
-    GenServer.call(server, :score)
+  def score(_) do
+    case :ets.lookup(@score_table, "player 1") |> IO.inspect(label: "SCORE") do
+      [{_, value}] ->
+        value
+
+      _ ->
+        :ets.insert(@score_table, {"player 1", 0})
+        0
+    end
   end
 
   def current_question(server) do
