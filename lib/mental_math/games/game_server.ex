@@ -5,8 +5,8 @@ defmodule MentalMath.Games.GameServer do
   # Callbacks
 
   @impl true
-  def init(opts) do
-    {:ok, %{score: 0, current_trivia: RandomTrivia.get(%SingleDigitAddition{})}}
+  def init(_opts) do
+    {:ok, %{score: 0, current_trivia: new_trivia()}}
   end
 
   @impl true
@@ -30,7 +30,8 @@ defmodule MentalMath.Games.GameServer do
       {:reply, true,
        %{
          state
-         | score: state.score + 1
+         | score: state.score + 1,
+           current_trivia: new_trivia()
        }}
     end
   end
@@ -53,5 +54,9 @@ defmodule MentalMath.Games.GameServer do
 
   def answer(server, answer) do
     GenServer.call(server, {:answer, answer})
+  end
+
+  def new_trivia() do
+    RandomTrivia.get(%SingleDigitAddition{})
   end
 end

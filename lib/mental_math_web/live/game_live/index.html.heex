@@ -1,3 +1,10 @@
 <h1>Live Game In Progress</h1>
 <h1>Score: <%= @score %></h1>
 <h1>Question: <%= @question %></h1>
+<.form let={f} for={:answer} phx-submit="answer">
+  <%= label f, :value %>
+  <%= number_input f, :value %>
+  <%= error_tag f, :value %>
+
+  <%= submit "Save" %>
+</.form>

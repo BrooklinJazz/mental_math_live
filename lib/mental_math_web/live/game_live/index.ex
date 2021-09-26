@@ -7,9 +7,19 @@ defmodule MentalMathWeb.GameLive.Index do
     {:ok, server} = GameServer.start_link()
 
     {:ok,
-     assign(socket, score: GameServer.score(server), question: GameServer.current_question(server))}
+     assign(socket,
+       server: server,
+       score: GameServer.score(server),
+       question: GameServer.current_question(server)
+     )}
   end
 
-  def handle_event("answer") do
+  @impl true
+  def handle_event("answer", %{"answer" => %{"value" => value}}, socket) do
+    %{assigns: %{server: server}} = socket
+    GameServer.answer(server, String.to_integer(value))
+
+    {:noreply,
+     assign(socket, score: GameServer.score(server), question: GameServer.current_question(server))}
   end
 end
