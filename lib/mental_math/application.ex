@@ -15,7 +15,8 @@ defmodule MentalMath.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: MentalMath.PubSub},
       # Start the Endpoint (http/https)
-      MentalMathWeb.Endpoint
+      MentalMathWeb.Endpoint,
+      MentalMath.Games.GameServer
       # Start a worker by calling: MentalMath.Worker.start_link(arg)
       # {MentalMath.Worker, arg}
     ]
